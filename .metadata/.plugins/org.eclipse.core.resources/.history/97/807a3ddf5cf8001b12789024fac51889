@@ -1,0 +1,92 @@
+package database;
+
+public class QueryBuilder {
+	private StringBuilder query;
+
+	// select
+	public QueryBuilder select(String columns) {
+		this.query = new StringBuilder();
+		this.query.append("SELECT ").append(columns);
+
+		return this;
+	}
+
+	// select distinct
+	public QueryBuilder selectDistinct(String columns) {
+		this.query = new StringBuilder();
+		this.query.append("SELECT DISTINCT ").append(columns);
+
+		return this;
+	}
+
+	// from
+	public QueryBuilder from(String table) {
+		this.query.append(" FROM ").append(table);
+		return this;
+	}
+
+	// where
+	public QueryBuilder where(String condition) {
+		if (this.query.indexOf("WHERE") != -1) {
+			this.query.append(" AND ").append(condition);
+		} else {
+			this.query.append(" WHERE ").append(condition);
+		}
+
+		return this;
+	}
+
+	// delete
+	public QueryBuilder delete(String table) {
+		this.query = new StringBuilder();
+		this.query.append("DELETE FROM ").append(table);
+		return this;
+	}
+
+	// update
+	public QueryBuilder update(String table) {
+		this.query = new StringBuilder();
+		this.query.append("UPDATE ").append(table).append(" ").append("SET ");
+		return this;
+	}
+
+	// set
+	public QueryBuilder set(String strColumns) throws Exception {
+		strColumns = strColumns.trim();
+		String[] arrColumns = strColumns.split(",");
+
+		if (arrColumns.length == 0) {
+			throw new Exception("thieu cot");
+		}
+
+		for (String column : arrColumns) {
+			column = column.trim();
+			if (column.equals("")) {
+				throw new Exception("ten cot khong hop le");
+			}
+
+			this.query.append(column).append(" = ").append("?, ");
+		}
+
+		this.query.deleteCharAt(this.query.lastIndexOf(","));
+
+		return this;
+	}
+
+	// get query
+	public String getQuery() {
+		return this.query.toString();
+	}
+
+	public static void main(String[] args) {
+		QueryBuilder query = new QueryBuilder();
+		// System.out.println(
+		// query.selectDistinct("id, age, name").from("class, abc").where("x >
+		// ?").where("y > ?").getQuery());
+		try {
+			System.out.println(query.update("class").set("id, name").where("a > ?").getQuery());
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+	}
+}
