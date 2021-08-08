@@ -38,8 +38,8 @@ public class DB {
 		}
 	}
 
-	// _query: base query
-	public int query(String sql, Object[] params) throws SQLException {
+	// _query: base query for insert, delete, update
+	public int _query(String sql, Object[] params) throws SQLException {
 		this.open();
 		PreparedStatement pstmt = this.connection.prepareStatement(sql);
 
@@ -59,15 +59,10 @@ public class DB {
 		return rowChange;
 	}
 
-	// select
-	public ResultSet select(String table, String columns, String condition, Object[] params) throws SQLException {
+	// _get: base query for select
+	public ResultSet _get(String sql, Object[] params) throws SQLException {
 		this.open();
-
-		// make sql
-		this.query = new QueryBuilder();
-		this.query.select(columns).from(table).where(condition);
-
-		PreparedStatement pstmt = this.connection.prepareStatement(this.query.getQuery());
+		PreparedStatement pstmt = this.connection.prepareStatement(sql);
 
 		// bind param if exist
 		if (params != null) {
@@ -78,12 +73,26 @@ public class DB {
 			}
 		}
 
+		// execute sql and return ResultSet
 		ResultSet result = pstmt.executeQuery();
+
 		return result;
 	}
 
+	// select
+	public ResultSet select(String table, String columns, String condition, Object[] params) throws SQLException {
+		this.open();
+
+		// make sql
+		this.query = new QueryBuilder();
+		this.query.select(columns).from(table).where(condition);
+
+		return this._get(this.query.getQuery(), params);
+	}
+
 	// select distinct
-	public ResultSet selectDistinct(String table, String columns, String condition, Object[] params) throws SQLException {
+	public ResultSet selectDistinct(String table, String columns, String condition, Object[] params)
+			throws SQLException {
 		this.open();
 
 		// make sql
@@ -110,25 +119,38 @@ public class DB {
 		return this.select(table, "*", condition, params);
 	}
 
+	// update
+	public int update(String table, String columns, String condition, Object[] params) throws SQLException {
+		this.query = new QueryBuilder();
+		String sql = this.query.update(table).set(columns).where(condition).getQuery();
+		return this._query(sql, params);
+	}
+
+	// insert
+	public int insert(String table, String columns, Object[] params) throws SQLException {
+		this.query = new QueryBuilder();
+		String sql = this.query.insert(table, columns).values(params).getQuery();
+		return this._query(sql, params);
+	}
+
+	// delete
+	public int delete(String table, String condition, Object[] params) throws SQLException {
+		this.query = new QueryBuilder();
+		String sql = this.query.delete(table).where(condition).getQuery();
+		return this._query(sql, params);
+	}
+
 	public static void main(String[] args) {
 		DB db = new DB("localhost", "3306", "exercises_2", "long", "tnt");
 
 		try {
-			Object[] params = { "0" };
-//			db.query("insert into class(class_id, class_name) values(?,?)", params);
-			ResultSet rs = db.selectDistinct("class", "class_id", "class_id > ?", params);
-
-			while (rs.next()) {
-				System.out.println(rs.getInt("class_id"));
+			Object[] params = { "hellokk" };
+			ResultSet rs = db.select("class", "class_id, class_name", "class_name = ?", params);
+			while(rs.next()) {
+				System.out.println(rs.getString("class_name") + "-" + rs.getString("class_id"));
 			}
-			rs.close();
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
-		}
-		String a = "a\b,c";
-		String[] b = a.split("/|,");
-		for (String string : b) {
-			System.out.println(string.trim());
 		}
 	}
 }
