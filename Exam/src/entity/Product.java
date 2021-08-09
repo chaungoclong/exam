@@ -50,7 +50,7 @@ public class Product {
 		this.discount = discount;
 	}
 
-	public String print() {
+	public String printDetail() {
 		String price = String.format("%-10.1f",this.price);
 		String realPrice = String.format("%-10.1f",this.getRealPrice());
 		

@@ -20,10 +20,10 @@ public class ProductController {
 	public void index() {
 		try {
 			List<Product> products = this.dao.all();
-			
+
 			System.out.println("\n***DANH SACH SAN PHAM***");
 			for (Product product : products) {
-				System.out.println(product.print());
+				System.out.println(product.printDetail());
 			}
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
@@ -31,14 +31,14 @@ public class ProductController {
 	}
 
 	// sort by real price
-	public void sortByRealPrice() {
+	public void sortByPrice() {
 		try {
 			List<Product> products = this.dao.all();
-			products.sort(Comparator.comparing(Product::getRealPrice));
-			
+			products.sort(Comparator.comparing(Product::getPrice).reversed());
+
 			System.out.println("\n***DANH SACH SAN PHAM SAU KHI SAP XEP***");
 			for (Product product : products) {
-				System.out.println(product.print());
+				System.out.println(product.printDetail());
 			}
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
@@ -48,18 +48,22 @@ public class ProductController {
 	// add product
 	public void add() {
 		System.out.println("\n***THEM SAN PHAM***");
-		
-		String code = inputString("code:");
-		String name = inputString("name:");
-		double price = inputDouble("price:");
-		double discount = inputDouble("discount:");
+		int choice = 1;
 
-		try {
-			Product product = new Product(code, name, price, discount);
-			this.dao.add(product);
-			System.out.println("---Them Thanh Cong---");
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
+		while (choice == 1) {
+			String code = inputString("code:");
+			String name = inputString("name:");
+			double price = inputDouble("price:");
+			double discount = inputDouble("discount:");
+
+			try {
+				Product product = new Product(code, name, price, discount);
+				this.dao.add(product);
+				System.out.println("---Them Thanh Cong---");
+				choice = inputInt("1:tiep tuc\t\t0.thoat");
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+			}
 		}
 	}
 
@@ -75,6 +79,19 @@ public class ProductController {
 		while (true) {
 			try {
 				double value = Double.parseDouble(this.sc.nextLine());
+				return value;
+			} catch (Exception e) {
+				System.out.println("nhap lai:");
+			}
+		}
+	}
+
+	// input int
+	public int inputInt(String message) {
+		System.out.println(message);
+		while (true) {
+			try {
+				int value = Integer.parseInt(this.sc.nextLine());
 				return value;
 			} catch (Exception e) {
 				System.out.println("nhap lai:");

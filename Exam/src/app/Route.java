@@ -74,7 +74,7 @@ public class Route {
 					
 					// sort
 					case 2:
-						productController.sortByRealPrice();
+						productController.sortByPrice();
 						break;
 					
 					case 3:
@@ -98,8 +98,6 @@ public class Route {
 	}
 
 	public static void main(String[] args) {
-		DB db = new DB("localhost", "3306", "exam", "long", "tnt");
-		Route route = new Route(db);
-		route.run();
+		
 	}
 }

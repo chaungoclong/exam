@@ -37,7 +37,7 @@ public class ProductDao {
 			List<Product> list = dao.all();
 			list.sort(Comparator.comparing(Product::getRealPrice));
 			for (Product product : list) {
-				System.out.println(product.print());
+				System.out.println(product.printDetail());
 			}
 
 		} catch (Exception e) {
